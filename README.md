@@ -1,5 +1,6 @@
 Color-O-Tron
 ============
+**Check the wiki for the latest hardware news**
 
 A small, inexpensive electronics kit intended for distribution at Maker Faires and other eductational events.
 
