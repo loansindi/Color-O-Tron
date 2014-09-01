@@ -22,7 +22,6 @@ int roundNum = 0;
 
 void setup()
 {
-    Serial.begin(9600);
     pinMode(ledRed, OUTPUT);
     pinMode(ledBlue, OUTPUT);
     pinMode(ledGreen, OUTPUT);
@@ -34,10 +33,9 @@ void setup()
     // One proposed solution is using the time a player takes to make his choices as a seed - this would require building the array as the game progressed
     for(int i=0; i<=6; i++) {
        pattern[i] = random(3);
-       Serial.println(pattern[i]);
   }
     // make sure the LED's turning on as expected
-    // initialize();
+    initialize();
 }
 
 void loop()
@@ -45,6 +43,7 @@ void loop()
     // loop() is likely to stay pretty sparse as most of the logic is happening elsewhere
     play();    
     input();
+    delay(500);
     roundNum++;
 
 }
@@ -57,17 +56,16 @@ void input()
         }
         if(analogRead(inputRed)){
             playerInput[i] = red;
-            blinkLed(red, 200, 100);
+            blinkLed(ledRed, 200, 100);
         }
         else if(analogRead(inputGreen)){
             playerInput[i] = green;
-            blinkLed(green, 200, 100);
+            blinkLed(ledGreen, 200, 100);
         }
         else{
             playerInput[i] = blue;
-            blinkLed(blue, 200, 100);
+            blinkLed(ledBlue, 200, 100);
         }
-        Serial.println(playerInput[i]);
         checkInput(i);
             
         }   
@@ -89,16 +87,17 @@ void blinkLed(int pin, int duration, int interval) {
 
 void initialize() // some kind of pre-game animation
 {
-    blinkLed(ledRed, 100, 0);
-    blinkLed(ledGreen, 100, 0);
-    blinkLed(ledBlue, 100, 0);
+    blinkLed(ledRed, 100, 100);
+    blinkLed(ledGreen, 100, 100);
+    blinkLed(ledBlue, 100, 100);
+    delay(500);
 }
 
 void lose(){
     // the goal of lose() is to notify the player of a lose condition
     // and to reset game state so they can play again
-    digitalWrite(ledRed, HIGH);
     digitalWrite(ledGreen, HIGH);
+    delay(100);
     digitalWrite(ledBlue, HIGH);
     delay(500); // right now this is only lighting the red LED - look into
     wdt_enable(WDTO_15MS); // initialize a watchdog timer - this will reset the microcontroller after 15 seconds
