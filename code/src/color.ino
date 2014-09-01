@@ -51,41 +51,17 @@ void input()
     // at this point we'll need to figure out which pin was activated - i'm hoping an if/else/then statement will be sufficient - with only three inputs it should be quick enough to catch the input before the finger goes away. This will get stored - probably as an array so we can compare the two 
 }
 void play() {
+    int[] pins = [ledRed, ledGreen, ledBlue];
+    
     for(int i=0; i<=roundNum; i++) {
-        switch(pattern[i]) {
-            case 0:
-                red();
-                break;
-            case 1:
-                blue();
-                break;
-            case 2:
-                green();
-                break;
-        }
+        blinkLed(pattern[pins[i]]);
     }
 }
-void red()
-{
-    digitalWrite(ledRed, HIGH);
-    delay(200);
-    digitalWrite(ledRed, LOW);
-    delay(200);
-}
 
-void blue()
-{
-    digitalWrite(ledBlue, HIGH);
+void blinkLed(int pin) {
+    digitalWrite(pin, HIGH);
     delay(200);
-    digitalWrite(ledBlue, LOW);
-    delay(200);
-}
-
-void green()
-{
-    digitalWrite(ledGreen, HIGH);
-    delay(200);
-    digitalWrite(ledGreen, LOW);
+    digitalWrite(pin, LOW);
     delay(200);
 }
 
