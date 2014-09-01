@@ -12,6 +12,11 @@ The basic premise is to emulate Simon - the electronic pattern-matching game - i
 
 ---
 
+How can I help?
+-----
+
+The final board is probably going to be based on an ATTiny85 - the project will use all available GPIO (including the reset pin). Low-voltage indicator LEDs (rather than modern high-brightness units, driving the LED from the 3v battery is our constraint).
+
 Current tasks
 
 1. Investigate input options
