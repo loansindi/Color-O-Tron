@@ -15,7 +15,5 @@ The basic premise is to emulate Simon - the electronic pattern-matching game - i
 Current tasks
 
 1. Investigate input options
-    * QTouch
-    * ADC as input
+    * ADC as input seems to be functional enough. Use a ~Mohm resistor as a pulldown
 2. Design board art
-3. Rough up game code
