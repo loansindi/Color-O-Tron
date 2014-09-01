@@ -67,8 +67,8 @@ void blinkLed(int pin) {
 
 void initialize()
 {
-    red();
-    green();
-    blue();
+    blinkLed(ledRed);
+    blinkLed(ledGreen);
+    blinkLed(ledBlue);
 }
 
