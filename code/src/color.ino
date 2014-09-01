@@ -1,14 +1,19 @@
 // An arduino-based, simple implementation of a pattern-memory game
-
+#include <avr/wdt.h>
 // Declare pin assignments
 #define ledRed 3
 #define ledGreen 5
 #define ledBlue 6
+// constants to make referring to colors easier
+#define red 0
+#define green 1
+#define blue 2
 // Our input pins are pulled down to ground - the plan is to use the player as a switch
 #define inputRed A0
 #define inputGreen A1
 #define inputBlue A2
 // pattern will be the sequence the player needs to remember
+// it's seven steps long at the moment - this will need to be dynamic or large enough to beat most players (or i guess there could be a win condition)
 int pattern[7];
 // i'm not sure if player input needs to be stored as an array - still working on this bit
 int playerInput[7];
@@ -17,6 +22,7 @@ int roundNum = 0;
 
 void setup()
 {
+    Serial.begin(9600);
     pinMode(ledRed, OUTPUT);
     pinMode(ledBlue, OUTPUT);
     pinMode(ledGreen, OUTPUT);
@@ -28,10 +34,10 @@ void setup()
     // One proposed solution is using the time a player takes to make his choices as a seed - this would require building the array as the game progressed
     for(int i=0; i<=6; i++) {
        pattern[i] = random(3);
+       Serial.println(pattern[i]);
   }
     // make sure the LED's turning on as expected
-    initialize();
-    delay(500);
+    // initialize();
 }
 
 void loop()
@@ -39,36 +45,70 @@ void loop()
     // loop() is likely to stay pretty sparse as most of the logic is happening elsewhere
     play();    
     input();
+    roundNum++;
 
 }
-
 void input()
 {
     // Here we're waiting for the user to do something, this loop will continue forever until voltage is present on one of our input pins
-    while(analogRead(inputRed) == 0 && analogRead(inputGreen) == 0 && analogRead(inputBlue) == 0) {
+    for(int i=0; i<=roundNum; i++){
+        while(analogRead(inputRed) == 0 && analogRead(inputGreen) == 0 && analogRead(inputBlue) == 0) {
         ;
-    }   
-    // at this point we'll need to figure out which pin was activated - i'm hoping an if/else/then statement will be sufficient - with only three inputs it should be quick enough to catch the input before the finger goes away. This will get stored - probably as an array so we can compare the two 
+        }
+        if(analogRead(inputRed)){
+            playerInput[i] = red;
+            blinkLed(red, 200, 100);
+        }
+        else if(analogRead(inputGreen)){
+            playerInput[i] = green;
+            blinkLed(green, 200, 100);
+        }
+        else{
+            playerInput[i] = blue;
+            blinkLed(blue, 200, 100);
+        }
+        Serial.println(playerInput[i]);
+        checkInput(i);
+            
+        }   
 }
 void play() {
     int pins[] = {ledRed, ledGreen, ledBlue};
     
     for(int i=0; i<=roundNum; i++) {
-        blinkLed(pattern[pins[i]]);
+        blinkLed(pins[pattern[i]], 300, 300);
     }
 }
 
-void blinkLed(int pin) {
+void blinkLed(int pin, int duration, int interval) {
     digitalWrite(pin, HIGH);
-    delay(200);
+    delay(duration);
     digitalWrite(pin, LOW);
-    delay(200);
+    delay(interval);
 }
 
-void initialize()
+void initialize() // some kind of pre-game animation
 {
-    blinkLed(ledRed);
-    blinkLed(ledGreen);
-    blinkLed(ledBlue);
+    blinkLed(ledRed, 100, 0);
+    blinkLed(ledGreen, 100, 0);
+    blinkLed(ledBlue, 100, 0);
 }
 
+void lose(){
+    // the goal of lose() is to notify the player of a lose condition
+    // and to reset game state so they can play again
+    digitalWrite(ledRed, HIGH);
+    digitalWrite(ledGreen, HIGH);
+    digitalWrite(ledBlue, HIGH);
+    delay(500); // right now this is only lighting the red LED - look into
+    wdt_enable(WDTO_15MS); // initialize a watchdog timer - this will reset the microcontroller after 15 seconds
+    while(1){} // kill some time so the watchdog timer kicks in
+}
+
+void checkInput(int rounds){ // straightfoward - if the array the player builds doesn't match the existing array, they lose.
+    for(int i=0; i<=rounds; i++){
+        if(playerInput[i] != pattern[i]) {
+            lose();
+        }
+    }
+}
