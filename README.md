@@ -17,3 +17,4 @@ Current tasks
 1. Investigate input options
     * ADC as input seems to be functional enough. Use a ~Mohm resistor as a pulldown
 2. Design board art
+3. Work on game code. Right now it's mostly functional but has some issues - readily visible if you build the hardware
