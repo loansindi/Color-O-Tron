@@ -51,7 +51,7 @@ void input()
     // at this point we'll need to figure out which pin was activated - i'm hoping an if/else/then statement will be sufficient - with only three inputs it should be quick enough to catch the input before the finger goes away. This will get stored - probably as an array so we can compare the two 
 }
 void play() {
-    int[] pins = [ledRed, ledGreen, ledBlue];
+    int pins[] = {ledRed, ledGreen, ledBlue};
     
     for(int i=0; i<=roundNum; i++) {
         blinkLed(pattern[pins[i]]);
