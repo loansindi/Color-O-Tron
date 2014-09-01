@@ -54,7 +54,7 @@ void play() {
     int pins[] = {ledRed, ledGreen, ledBlue};
     
     for(int i=0; i<=roundNum; i++) {
-        blinkLed(pattern[pins[i]]);
+        blinkLed(pins[pattern[i]]);
     }
 }
 
