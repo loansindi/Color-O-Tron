@@ -13,15 +13,16 @@
 #define inputGreen A1
 #define inputBlue A2
 // pattern will be the sequence the player needs to remember
-// it's seven steps long at the moment - this will need to be dynamic or large enough to beat most players (or i guess there could be a win condition)
-int pattern[7];
+// This implementation is deterministic, it will generate the same sequence of numbers every time you restart the uC. Normally you would seed the RNG with a floating analog input pin, but my target microcontroller only has 3 ADCs so they'll all be tied to ground.
+int pattern[20];
 // i'm not sure if player input needs to be stored as an array - still working on this bit
-int playerInput[7];
+int playerInput[20];
 // tracking what 'round' the game on is the big problem I'm thinking about at the moment
 int roundNum = 0;
 
 void setup()
 {
+    Serial.begin(9600);
     pinMode(ledRed, OUTPUT);
     pinMode(ledBlue, OUTPUT);
     pinMode(ledGreen, OUTPUT);
@@ -29,11 +30,8 @@ void setup()
     pinMode(inputRed, INPUT);
     pinMode(inputGreen, INPUT);
     pinMode(inputBlue, INPUT);
-    // This implementation is deterministic, it will generate the same sequence of numbers every time you restart the uC. Normally you would seed the RNG with a floating analog input pin, but my target microcontroller only has 3 ADCs so they'll all be tied to ground.
     // One proposed solution is using the time a player takes to make his choices as a seed - this would require building the array as the game progressed
-    for(int i=0; i<=6; i++) {
-       pattern[i] = random(3);
-  }
+    pattern[0] = 0;
     // make sure the LED's turning on as expected
     initialize();
 }
@@ -45,22 +43,28 @@ void loop()
     input();
     delay(500);
     roundNum++;
+    pattern[roundNum] = random(3);
 
 }
 void input()
 {
     // Here we're waiting for the user to do something, this loop will continue forever until voltage is present on one of our input pins
+    unsigned long time = micros();
     for(int i=0; i<=roundNum; i++){
         while(analogRead(inputRed) == 0 && analogRead(inputGreen) == 0 && analogRead(inputBlue) == 0) {
         ;
         }
+        int seedVal = micros() - time;
+        seed(seedVal);
         if(analogRead(inputRed)){
             playerInput[i] = red;
             blinkLed(ledRed, 200, 100);
+            break;
         }
         else if(analogRead(inputGreen)){
             playerInput[i] = green;
             blinkLed(ledGreen, 200, 100);
+            break;
         }
         else{
             playerInput[i] = blue;
@@ -110,4 +114,8 @@ void checkInput(int rounds){ // straightfoward - if the array the player builds 
             lose();
         }
     }
+}
+
+void seed(int seeed) {
+   randomSeed(seeed); 
 }
