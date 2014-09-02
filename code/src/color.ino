@@ -14,10 +14,16 @@
 #define inputBlue A2
 //A timeout value for fail condition
 #define INPUT_TIMEOUT 1000000  //1 second in micros
+//Definitions to get rid of "magic numbers", will help in tweaking game behavior
+#define INPUT_TIME_ON 300
+#define INPUT_TIME_OFF 200
+#define PLAY_TIME_ON 300
+#define PLAY_TIME_OFF 200
+#define MAX_ROUNDS 20
 // pattern will be the sequence the player needs to remember
-byte pattern[20];
+byte pattern[MAX_ROUNDS];
 // this array tracks player input
-byte playerInput[20];
+byte playerInput[MAX_ROUNDS];
 // stores which 'round' of the game we're on - used primarily to set limits for array indexing
 int roundNum = 0;
 
@@ -64,17 +70,17 @@ void input()
         while(inputReceived == 0) {
             if(analogRead(inputRed)) {
                 playerInput[i] = red;
-                blinkLed(ledRed, 300, 200);
+                blinkLed(ledRed, INPUT_TIME_ON, INPUT_TIME_OFF);
                 inputReceived = 1;
             }
             else if(analogRead(inputGreen)) {
                 playerInput[i] = green;
-                blinkLed(ledGreen, 300, 200);
+                blinkLed(ledGreen, INPUT_TIME_ON, INPUT_TIME_OFF);
                 inputReceived = 1;
             }
             else if(analogRead(inputBlue)) {
                 playerInput[i] = blue;
-                blinkLed(ledBlue, 300, 200);
+                blinkLed(ledBlue, INPUT_TIME_ON, INPUT_TIME_OFF);
                 inputReceived = 1;
             }
         }
@@ -87,7 +93,7 @@ void play() {
     int pins[] = {ledRed, ledGreen, ledBlue};
 
     for(int i=0; i<=roundNum; i++) {
-        blinkLed(pins[pattern[i]], 300, 300);
+        blinkLed(pins[pattern[i]], PLAY_TIME_ON, PLAY_TIME_OFF);
     }
 }
 
@@ -118,14 +124,14 @@ void lose() {
     while(1) {} // kill some time so the watchdog timer kicks in
 }
 
-void checkInput(int rounds) { // straightfoward - if the array the player builds doesn't match the existing array, they lose.
+void checkAllInputs(int rounds) { // straightfoward - if the array the player builds doesn't match the existing array, they lose.
     for(int i=0; i<=rounds; i++) {
-        checkCurrInput(i)
+        checkCurrentInput(i);
     }
 }
 
 void checkCurrentInput(int round) { //Function to only check the current round, bit more efficient than checkInput running everytime
-    if(playerInput[round] != pattern[i] {
+    if(playerInput[round] != pattern[round]) {
         lose();
     } 
 }
