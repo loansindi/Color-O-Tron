@@ -44,11 +44,14 @@ void setup()
 void loop()
 {
     // loop() is likely to stay pretty sparse as most of the logic is happening elsewhere
-    play();
-    input();
-    delay(500); // it's confusing when the next round starts too soon
-    roundNum++;
-    pattern[roundNum] = random(3); // add another step to the game pattern
+    for(int i = 0; i < MAX_ROUNDS; i++) {
+        play();
+        input();
+        delay(500); // it's confusing when the next round starts too soon
+        roundNum++;
+        pattern[roundNum] = random(3); // add another step to the game pattern
+    }
+    win();
 
 }
 void input()
@@ -120,8 +123,22 @@ void lose() {
     delay(100);
     digitalWrite(ledBlue, HIGH);
     delay(500);
-    wdt_enable(WDTO_15MS); // initialize a watchdog timer - this will reset the microcontroller after 15 milliseconds
-    while(1) {} // kill some time so the watchdog timer kicks in
+    restart();
+}
+
+void win() {
+    //Notify player that they beat the game    
+    for(int i = 0; i < 10; i ++) {
+        for (int j = 0; j < 3; j++) {
+            blinkLed(j, 100, 50);
+        }    
+    }
+    restart();
+}
+
+void restart() {
+  wdt_enable(WDTO_15MS); // initialize a watchdog timer - this will reset the microcontroller after 15 milliseconds
+  while(1) {} // kill some time so the watchdog timer kicks in
 }
 
 void checkAllInputs(int rounds) { // straightfoward - if the array the player builds doesn't match the existing array, they lose.
