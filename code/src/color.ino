@@ -13,7 +13,6 @@
 #define inputGreen A1
 #define inputBlue A2
 // pattern will be the sequence the player needs to remember
-// This implementation is deterministic, it will generate the same sequence of numbers every time you restart the uC. Normally you would seed the RNG with a floating analog input pin, but my target microcontroller only has 3 ADCs so they'll all be tied to ground.
 byte pattern[20];
 // i'm not sure if player input needs to be stored as an array - still working on this bit
 byte playerInput[20];
