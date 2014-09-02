@@ -29,7 +29,6 @@ void setup()
     pinMode(inputRed, INPUT);
     pinMode(inputGreen, INPUT);
     pinMode(inputBlue, INPUT);
-    // One proposed solution is using the time a player takes to make his choices as a seed - this would require building the array as the game progressed
     pattern[0] = 0;
     // make sure the LED's turning on as expected
     initialize();
