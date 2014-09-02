@@ -14,9 +14,9 @@
 #define inputBlue A2
 // pattern will be the sequence the player needs to remember
 // This implementation is deterministic, it will generate the same sequence of numbers every time you restart the uC. Normally you would seed the RNG with a floating analog input pin, but my target microcontroller only has 3 ADCs so they'll all be tied to ground.
-int pattern[20];
+byte pattern[20];
 // i'm not sure if player input needs to be stored as an array - still working on this bit
-int playerInput[20];
+byte playerInput[20];
 // tracking what 'round' the game on is the big problem I'm thinking about at the moment
 int roundNum = 0;
 
@@ -48,6 +48,7 @@ void loop()
 }
 void input()
 {
+    Serial.println("input()");
     // Here we're waiting for the user to do something, this loop will continue forever until voltage is present on one of our input pins
     unsigned long time = micros();
     for(int i=0; i<=roundNum; i++){
@@ -58,23 +59,22 @@ void input()
         seed(seedVal);
         if(analogRead(inputRed)){
             playerInput[i] = red;
-            blinkLed(ledRed, 200, 100);
-            break;
+            blinkLed(ledRed, 300, 200);
         }
         else if(analogRead(inputGreen)){
             playerInput[i] = green;
-            blinkLed(ledGreen, 200, 100);
-            break;
+            blinkLed(ledGreen, 300, 200);
         }
         else{
             playerInput[i] = blue;
-            blinkLed(ledBlue, 200, 100);
+            blinkLed(ledBlue, 300, 200);
         }
         checkInput(i);
             
         }   
 }
 void play() {
+    Serial.println("play()");
     int pins[] = {ledRed, ledGreen, ledBlue};
     
     for(int i=0; i<=roundNum; i++) {
@@ -83,6 +83,7 @@ void play() {
 }
 
 void blinkLed(int pin, int duration, int interval) {
+    Serial.println("blinkLED()");
     digitalWrite(pin, HIGH);
     delay(duration);
     digitalWrite(pin, LOW);
@@ -109,6 +110,7 @@ void lose(){
 }
 
 void checkInput(int rounds){ // straightfoward - if the array the player builds doesn't match the existing array, they lose.
+    Serial.println("checkInput()");
     for(int i=0; i<=rounds; i++){
         if(playerInput[i] != pattern[i]) {
             lose();
