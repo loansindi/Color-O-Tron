@@ -12,6 +12,8 @@
 #define inputRed A0
 #define inputGreen A1
 #define inputBlue A2
+//A timeout value for fail condition
+#define INPUT_TIMEOUT 1000000  //1 second in micros
 // pattern will be the sequence the player needs to remember
 byte pattern[20];
 // this array tracks player input
@@ -49,8 +51,10 @@ void input()
 
     // Here we're waiting for the user to do something, this loop will continue forever until voltage is present on one of our input pins
     for(int i=0; i<=roundNum; i++) {
-        while(analogRead(inputRed) == 0 && analogRead(inputGreen) == 0 && analogRead(inputBlue) == 0) {
-            ;
+        while(analogRead(inputRed) == 0 && analogRead(inputGreen) == 0 && analogRead(inputBlue) == 0 ) {
+            if((micros() - time) > INPUT_TIMEOUT) {  //Timeout waiting for user input
+                lose();
+            }
         }
         // we're using the time it takes for the player to make a choice for our random seed - this function would work just as well if it was only called once per game but this placement is easy enough
         int seedVal = micros() - time;
@@ -74,7 +78,7 @@ void input()
                 inputReceived = 1;
             }
         }
-        checkInput(i);
+        checkCurrentInput(i);
 
     }
 }
@@ -116,9 +120,14 @@ void lose() {
 
 void checkInput(int rounds) { // straightfoward - if the array the player builds doesn't match the existing array, they lose.
     for(int i=0; i<=rounds; i++) {
-        if(playerInput[i] != pattern[i]) {
-            lose();
-        }
+        checkCurrInput(i)
     }
 }
+
+void checkCurrentInput(int round) { //Function to only check the current round, bit more efficient than checkInput running everytime
+    if(playerInput[round] != pattern[i] {
+        lose();
+    } 
+}
+
 
