@@ -60,8 +60,9 @@ void input()
 
     // Here we're waiting for the user to do something, this loop will continue forever until voltage is present on one of our input pins
     for(int i=0; i<=roundNum; i++) {
+        unsigned long roundTime = micros();
         while(analogRead(inputRed) == 0 && analogRead(inputGreen) == 0 && analogRead(inputBlue) == 0 ) {
-            if((micros() - time) > INPUT_TIMEOUT) {  //Timeout waiting for user input
+            if((micros() - roundTime) > INPUT_TIMEOUT) {  //Timeout waiting for user input
                 lose();
             }
         }
