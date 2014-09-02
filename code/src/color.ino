@@ -55,19 +55,28 @@ void input()
         while(analogRead(inputRed) == 0 && analogRead(inputGreen) == 0 && analogRead(inputBlue) == 0) {
         ;
         }
+        // we're using the time it takes for the player to make a choice for our random seed
         int seedVal = micros() - time;
-        seed(seedVal);
-        if(analogRead(inputRed)){
-            playerInput[i] = red;
-            blinkLed(ledRed, 300, 200);
-        }
-        else if(analogRead(inputGreen)){
-            playerInput[i] = green;
-            blinkLed(ledGreen, 300, 200);
-        }
-        else{
-            playerInput[i] = blue;
-            blinkLed(ledBlue, 300, 200);
+        randomSeed(seedVal);
+        // This is currently not ideal - the idea is that by the time the uC comes out of the while loop, the user will still be touching the input pin and we should be able to get the move simply by polling each ADC
+        // in reality this is resulting in fallthrough periodically - 
+        int inputReceived = 0;        
+        while(inputReceived == 0) {
+            if(analogRead(inputRed)){
+                playerInput[i] = red;
+                blinkLed(ledRed, 300, 200);
+                inputReceived = 1;
+            }
+            else if(analogRead(inputGreen)){
+                playerInput[i] = green;
+                blinkLed(ledGreen, 300, 200);
+                inputReceived = 1;
+            }
+            else if(analogRead(inputBlue)){
+                playerInput[i] = blue;
+                blinkLed(ledBlue, 300, 200);
+                inputReceived = 1;
+            }
         }
         checkInput(i);
             
@@ -118,6 +127,3 @@ void checkInput(int rounds){ // straightfoward - if the array the player builds 
     }
 }
 
-void seed(int seeed) {
-   randomSeed(seeed); 
-}
