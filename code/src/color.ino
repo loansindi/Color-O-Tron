@@ -22,7 +22,6 @@ int roundNum = 0;
 
 void setup()
 {
-    Serial.begin(9600);
     pinMode(ledRed, OUTPUT);
     pinMode(ledBlue, OUTPUT);
     pinMode(ledGreen, OUTPUT);
@@ -43,23 +42,22 @@ void loop()
     input();
     delay(500);
     roundNum++;
-    pattern[roundNum] = random(3);
+    pattern[roundNum] = random(3); // add another step to the game pattern
 
 }
 void input()
 {
-    Serial.println("input()");
+    unsigned long time = micros(); // if you aren't familiar, micros() returns the number of microseconds since power on. this is probably the most common way to time things and schedule tasks without using a delay()
+
     // Here we're waiting for the user to do something, this loop will continue forever until voltage is present on one of our input pins
-    unsigned long time = micros();
     for(int i=0; i<=roundNum; i++){
         while(analogRead(inputRed) == 0 && analogRead(inputGreen) == 0 && analogRead(inputBlue) == 0) {
         ;
         }
-        // we're using the time it takes for the player to make a choice for our random seed
+        // we're using the time it takes for the player to make a choice for our random seed - this function would work just as well if it was only called once per game but this placement is easy enough
         int seedVal = micros() - time;
         randomSeed(seedVal);
-        // This is currently not ideal - the idea is that by the time the uC comes out of the while loop, the user will still be touching the input pin and we should be able to get the move simply by polling each ADC
-        // in reality this is resulting in fallthrough periodically - 
+        // once the player has toucched a button, we use this loop to figure out which input they're touching - it's set up as a loop to prevent some weird fallthrough errors I was having pretty consistently
         int inputReceived = 0;        
         while(inputReceived == 0) {
             if(analogRead(inputRed)){
@@ -83,7 +81,7 @@ void input()
         }   
 }
 void play() {
-    Serial.println("play()");
+    // pretty straightforward here - just play back the pattern so far
     int pins[] = {ledRed, ledGreen, ledBlue};
     
     for(int i=0; i<=roundNum; i++) {
@@ -92,7 +90,7 @@ void play() {
 }
 
 void blinkLed(int pin, int duration, int interval) {
-    Serial.println("blinkLED()");
+    // this function takes three arguments - it might be overkill for this simple task but it's a good example of how to generalize functions. We can turn on any LED for an arbitrary amount of time, and also set how long it stays off before the next line of code executes.
     digitalWrite(pin, HIGH);
     delay(duration);
     digitalWrite(pin, LOW);
@@ -103,23 +101,22 @@ void initialize() // some kind of pre-game animation
 {
     blinkLed(ledRed, 100, 100);
     blinkLed(ledGreen, 100, 100);
-    blinkLed(ledBlue, 100, 100);
-    delay(500);
+    blinkLed(ledBlue, 100, 500);
 }
 
 void lose(){
     // the goal of lose() is to notify the player of a lose condition
     // and to reset game state so they can play again
+    // right now it just turns on multiple LEDs and resets everything. Maybe this could be an animation
     digitalWrite(ledGreen, HIGH);
     delay(100);
     digitalWrite(ledBlue, HIGH);
-    delay(500); // right now this is only lighting the red LED - look into
-    wdt_enable(WDTO_15MS); // initialize a watchdog timer - this will reset the microcontroller after 15 seconds
+    delay(500); 
+    wdt_enable(WDTO_15MS); // initialize a watchdog timer - this will reset the microcontroller after 15 milliseconds
     while(1){} // kill some time so the watchdog timer kicks in
 }
 
 void checkInput(int rounds){ // straightfoward - if the array the player builds doesn't match the existing array, they lose.
-    Serial.println("checkInput()");
     for(int i=0; i<=rounds; i++){
         if(playerInput[i] != pattern[i]) {
             lose();
