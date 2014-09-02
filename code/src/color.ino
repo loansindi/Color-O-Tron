@@ -4,6 +4,7 @@
 #define ledRed 3
 #define ledGreen 5
 #define ledBlue 6
+int pins[] = {ledRed, ledGreen, ledBlue};
 // constants to make referring to colors easier
 #define red 0
 #define green 1
@@ -94,7 +95,6 @@ void input()
 }
 void play() {
     // pretty straightforward here - just play back the pattern so far
-    int pins[] = {ledRed, ledGreen, ledBlue};
 
     for(int i=0; i<=roundNum; i++) {
         blinkLed(pins[pattern[i]], PLAY_TIME_ON, PLAY_TIME_OFF);
@@ -128,10 +128,11 @@ void lose() {
 }
 
 void win() {
-    //Notify player that they beat the game    
+    //Notify player that they beat the game   
+    
     for(int i = 0; i < 10; i ++) {
         for (int j = 0; j < 3; j++) {
-            blinkLed(j, 100, 50);
+            blinkLed(pins[j], 100, 50);
         }    
     }
     restart();
