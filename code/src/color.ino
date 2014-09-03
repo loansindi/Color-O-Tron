@@ -14,7 +14,7 @@ int pins[] = {ledRed, ledGreen, ledBlue};
 #define inputGreen A1
 #define inputBlue A2
 //A timeout value for fail condition
-#define INPUT_TIMEOUT 1000000  //1 second in micros
+#define INPUT_TIMEOUT 5000000  //1 second in micros
 //Definitions to get rid of "magic numbers", will help in tweaking game behavior
 #define INPUT_TIME_ON 300
 #define INPUT_TIME_OFF 200
