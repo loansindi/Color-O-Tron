@@ -4,6 +4,7 @@
 #define ledRed 3
 #define ledGreen 5
 #define ledBlue 6
+int pins[] = {ledRed, ledGreen, ledBlue};
 // constants to make referring to colors easier
 #define red 0
 #define green 1
@@ -12,10 +13,18 @@
 #define inputRed A0
 #define inputGreen A1
 #define inputBlue A2
+//A timeout value for fail condition
+#define INPUT_TIMEOUT 1000000  //1 second in micros
+//Definitions to get rid of "magic numbers", will help in tweaking game behavior
+#define INPUT_TIME_ON 300
+#define INPUT_TIME_OFF 200
+#define PLAY_TIME_ON 300
+#define PLAY_TIME_OFF 200
+#define MAX_ROUNDS 20
 // pattern will be the sequence the player needs to remember
-byte pattern[20];
+byte pattern[MAX_ROUNDS];
 // this array tracks player input
-byte playerInput[20];
+byte playerInput[MAX_ROUNDS];
 // stores which 'round' of the game we're on - used primarily to set limits for array indexing
 int roundNum = 0;
 
@@ -36,11 +45,14 @@ void setup()
 void loop()
 {
     // loop() is likely to stay pretty sparse as most of the logic is happening elsewhere
-    play();
-    input();
-    delay(500); // it's confusing when the next round starts too soon
-    roundNum++;
-    pattern[roundNum] = random(3); // add another step to the game pattern
+    for(int i = 0; i < MAX_ROUNDS; i++) {
+        play();
+        input();
+        delay(500); // it's confusing when the next round starts too soon
+        roundNum++;
+        pattern[roundNum] = random(3); // add another step to the game pattern
+    }
+    win();
 
 }
 void input()
@@ -49,8 +61,11 @@ void input()
 
     // Here we're waiting for the user to do something, this loop will continue forever until voltage is present on one of our input pins
     for(int i=0; i<=roundNum; i++) {
-        while(analogRead(inputRed) == 0 && analogRead(inputGreen) == 0 && analogRead(inputBlue) == 0) {
-            ;
+        unsigned long roundTime = micros();
+        while(analogRead(inputRed) == 0 && analogRead(inputGreen) == 0 && analogRead(inputBlue) == 0 ) {
+            if((micros() - roundTime) > INPUT_TIMEOUT) {  //Timeout waiting for user input
+                lose();
+            }
         }
         // we're using the time it takes for the player to make a choice for our random seed - this function would work just as well if it was only called once per game but this placement is easy enough
         int seedVal = micros() - time;
@@ -60,30 +75,29 @@ void input()
         while(inputReceived == 0) {
             if(analogRead(inputRed)) {
                 playerInput[i] = red;
-                blinkLed(ledRed, 300, 200);
+                blinkLed(ledRed, INPUT_TIME_ON, INPUT_TIME_OFF);
                 inputReceived = 1;
             }
             else if(analogRead(inputGreen)) {
                 playerInput[i] = green;
-                blinkLed(ledGreen, 300, 200);
+                blinkLed(ledGreen, INPUT_TIME_ON, INPUT_TIME_OFF);
                 inputReceived = 1;
             }
             else if(analogRead(inputBlue)) {
                 playerInput[i] = blue;
-                blinkLed(ledBlue, 300, 200);
+                blinkLed(ledBlue, INPUT_TIME_ON, INPUT_TIME_OFF);
                 inputReceived = 1;
             }
         }
-        checkInput(i);
+        checkCurrentInput(i);
 
     }
 }
 void play() {
     // pretty straightforward here - just play back the pattern so far
-    int pins[] = {ledRed, ledGreen, ledBlue};
 
     for(int i=0; i<=roundNum; i++) {
-        blinkLed(pins[pattern[i]], 300, 300);
+        blinkLed(pins[pattern[i]], PLAY_TIME_ON, PLAY_TIME_OFF);
     }
 }
 
@@ -110,15 +124,35 @@ void lose() {
     delay(100);
     digitalWrite(ledBlue, HIGH);
     delay(500);
-    wdt_enable(WDTO_15MS); // initialize a watchdog timer - this will reset the microcontroller after 15 milliseconds
-    while(1) {} // kill some time so the watchdog timer kicks in
+    restart();
 }
 
-void checkInput(int rounds) { // straightfoward - if the array the player builds doesn't match the existing array, they lose.
+void win() {
+    //Notify player that they beat the game   
+    
+    for(int i = 0; i < 10; i ++) {
+        for (int j = 0; j < 3; j++) {
+            blinkLed(pins[j], 100, 50);
+        }    
+    }
+    restart();
+}
+
+void restart() {
+  wdt_enable(WDTO_15MS); // initialize a watchdog timer - this will reset the microcontroller after 15 milliseconds
+  while(1) {} // kill some time so the watchdog timer kicks in
+}
+
+void checkAllInputs(int rounds) { // straightfoward - if the array the player builds doesn't match the existing array, they lose.
     for(int i=0; i<=rounds; i++) {
-        if(playerInput[i] != pattern[i]) {
-            lose();
-        }
+        checkCurrentInput(i);
     }
 }
+
+void checkCurrentInput(int round) { //Function to only check the current round, bit more efficient than checkInput running everytime
+    if(playerInput[round] != pattern[round]) {
+        lose();
+    } 
+}
+
 
