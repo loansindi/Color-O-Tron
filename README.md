@@ -8,7 +8,7 @@ This kit requires no soldering - all electrical connections are made simply by t
 
 The basic premise is to emulate Simon - the electronic pattern-matching game - in the simplest way possible. This version will have only 3 colors (red, amber and green old-school indicator LEDs) and will use the simplest possible user input (hopefully a piece of bare wire will act as a switch, either by polling ADC inputs or using Atmel's QTouch libray. Experimentation is needed).
 
-![Board Art](https://raw.githubusercontent.com/loansindi/Color-O-Tron/master/laser_cut_board.png)
+![Board Art](https://raw.githubusercontent.com/loansindi/Color-O-Tron/attiny_support/laser_cut_board.png)
 
 ---
 
