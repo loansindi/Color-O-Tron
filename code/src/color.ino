@@ -1,18 +1,47 @@
+/* Set platform as needed.
+   Valid options are: 
+   * Uno = 1
+   * ATTiny84 = 2
+*/
+
+#define platform 2
+
+
+/* #if platform == 1
+// Declare pin assignments
+    #define ledRed 3
+    #define ledGreen 5
+    #define ledBlue 6
+
+// Our input pins are pulled down to ground - the plan is to use the player as a switch
+    #define inputRed A0
+    #define inputGreen A1
+    #define inputBlue A2
+
+#elif platform == 2
+*/
+// Declare output pin assignments
+    #define ledRed 9
+    #define ledGreen 8
+    #define ledBlue 6
+// Declare inputs - these will be pulled down to ground with a 1Mohm resistor
+    #define inputRed 1
+    #define inputGreen 3
+    #define inputBlue 5
+
+/* #else 
+    #error What the fuuuuuuuuuu
+    
+#endif
+*/
 // An arduino-based, simple implementation of a pattern-memory game
 #include <avr/wdt.h>
-// Declare pin assignments
-#define ledRed 3
-#define ledGreen 5
-#define ledBlue 6
+
 int pins[] = {ledRed, ledGreen, ledBlue};
 // constants to make referring to colors easier
 #define red 0
 #define green 1
 #define blue 2
-// Our input pins are pulled down to ground - the plan is to use the player as a switch
-#define inputRed A0
-#define inputGreen A1
-#define inputBlue A2
 //A timeout value for fail condition
 #define INPUT_TIMEOUT 5000000  //1 second in micros
 //Definitions to get rid of "magic numbers", will help in tweaking game behavior
