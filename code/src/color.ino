@@ -1,13 +1,15 @@
 // An arduino-based, simple implementation of a pattern-memory game
 #include <avr/wdt.h>
 // Declare output pin assignments
-    #define ledRed 10
+    #define ledRed 9
     #define ledGreen 8
     #define ledBlue 6
 // Declare inputs - these will be pulled down to ground with a 1Mohm resistor
     #define inputRed 1
-    #define inputGreen 2
-    #define inputBlue 3
+    #define inputGreen 3
+    #define inputBlue 5
+
+    #define randomInput 4
 
 
 int pins[] = {ledRed, ledGreen, ledBlue};
@@ -32,6 +34,7 @@ int roundNum = 0;
 
 void setup()
 {
+    randomSeed(analogRead(randomInput));
     pinMode(ledRed, OUTPUT);
     pinMode(ledBlue, OUTPUT);
     pinMode(ledGreen, OUTPUT);
