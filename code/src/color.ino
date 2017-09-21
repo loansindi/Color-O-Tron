@@ -65,16 +65,20 @@ void loop()
 
 void input()
 {
-  unsigned long time = millis(); // if you aren't familiar, millis() returns the number of milliseconds since power on. this is probably the most common way to time things and schedule tasks without using a delay()
+  unsigned long time = millis(); // if you aren't familiar, millis() returns the number of milliseconds since power on. 
+                         //this is probably the most common way to time things and schedule tasks without using a delay()
 
-  // Here we're waiting for the user to do something, this loop will continue forever until voltage is present on one of our input pins
+  // Here we're waiting for the user to do something, this loop will continue forever until voltage is 
+  //present on one of our input pins
   for(int i=0; i<=roundNum; i++) {
     unsigned long roundTime = millis();
 
-    // we're using the time it takes for the player to make a choice for our random seed - this function would work just as well if it was only called once per game but this placement is easy enough
+    // we're using the time it takes for the player to make a choice for our random seed
+    // this function would work just as well if it was only called once per game but this placement is easy enough
     int seedVal = millis() - time;
     randomSeed(seedVal);
-    // once the player has touched a button, we use this loop to figure out which input they're touching - it's set up as a loop to prevent some weird fallthrough errors I was having pretty consistently
+    // once the player has touched a button, we use this loop to figure out which input they're touching
+    // it's set up as a loop to prevent some weird fallthrough errors I was having pretty consistently
     int inputReceived = 0;
     while(inputReceived <5) {
       inputReceived = 0;
@@ -126,7 +130,9 @@ void play() {
 }
 
 void blinkLed(int pin, int duration, int interval) {
-  // this function takes three arguments - it might be overkill for this simple task but it's a good example of how to generalize functions. We can turn on any LED for an arbitrary amount of time, and also set how long it stays off before the next line of code executes.
+  // this function takes three arguments - it might be overkill for this simple task but 
+  // it's a good example of how to generalize functions. We can turn on any LED for an arbitrary 
+  // amount of time, and also set how long it stays off before the next line of code executes.
   digitalWrite(pin, HIGH);
   delay(duration);
   digitalWrite(pin, LOW);
@@ -171,13 +177,15 @@ void restart() { // we have a state machine thing going on here, reset things so
   initialize();  // step in loop() increments roundNum. 
 }
 
-void checkAllInputs(int rounds) { // straightfoward - if the array the player builds doesn't match the existing array, they lose.
+void checkAllInputs(int rounds) { // straightfoward - if the array the player builds doesn't
+                                  // match the existing array, they lose.
   for(int i=0; i<=rounds; i++) {
     checkCurrentInput(i);
   }
 }
 
-void checkCurrentInput(int round) { //Function to only check the current round, bit more efficient than checkInput running everytime
+void checkCurrentInput(int round) { // Function to only check the current round, 
+                                    // bit more efficient than checkInput running everytime
   if(playerInput[round] != pattern[round]) {
      lose();
   } 
